@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # application container from image build in docker file
+  customer-api:
+    image: 'docker-spring-boot-postgres' # the name of image that will be build from Dockerfile (when we add new stuff in our project and we want them to be take in account we need to remove the image by cmd: docker rmi image_id
+    build:
+      context: .  # path of Dockerfile
+    container_name: customer-api
+    depends_on:
+      - db
+    environment: # have to go in profile file if we are not using container to scale up application, but in this case it is here
+      - POSTGRES_USER=pw    #$YOUR_USERNAME
+      - POSTGRES_PASSWORD=test  #$YOUR_PASSWORD
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/demo #jdbc:postgresql://db:5432/$YOUR_DB_NAME
+      - SPRING_DATASOURCE_USERNAME=pw    #$YOUR_USERNAME
+      - SPRING_DATASOURCE_PASSWORD=test  #$YOUR_PASSWORD
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+    ports:
+      - "6868:8080"           # $LOCAL_PORT:$DOCKER_PORT
+
+  # db container from postgres image
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      - POSTGRES_USER=pw    #$YOUR_USERNAME
+      - POSTGRES_PASSWORD=test  #$YOUR_PASSWORD
+      - POSTGRES_DB=demo  #$YOUR_DB_NAME
+    ports:
+      - "5433:5432"
